@@ -1,21 +1,24 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const path = require("path");
 const app = express();
-const port = 3000;
+require("dotenv").config();
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+app.use(cors());
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// API endpoint example
-app.get("/api", (req, res) => {
-  res.json({ message: "Hello from the backend!" });
-});
+// Serve static files from the 'downloads' directory
+app.use("/downloads", express.static(path.join(__dirname, "downloads")));
 
-// All other requests should be handled by React
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-});
+// Include routes
+app.use(require("./routes/downloadRoutes"));
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+// Start the server
+app.listen(process.env.PORT, () => {
+  console.log(`Server is running at http://localhost:${process.env.PORT}`);
 });
